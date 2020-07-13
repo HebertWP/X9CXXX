@@ -1,9 +1,152 @@
 #include <Arduino.h>
+#include "X9C10X.h"
 
-void setup() {
-  // put your setup code here, to run once:
+void stateMachine(char in);
+uint8_t arrayToInteger(char *in);
+
+X9C10X digitalPot(1, 1, 1);
+
+void setup()
+{
+    Serial.begin(115200);
+    digitalPot.begin();
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void loop()
+{
+    if (Serial.available() > 0)
+        stateMachine(Serial.read());
+}
+
+enum state
+{
+    Sidle,
+    Sready,
+    Sset,
+    Sget,
+    Sinterger,
+    Sgetstandby,
+    Ssetstandby
+};
+
+void stateMachine(char in)
+{
+    static char reg;
+    static char val[3];
+    static uint8_t cont = 0;
+    static enum state state = Sidle;
+    switch (state)
+    {
+    case Sidle:
+        state = (in == '#') ? Sready : Sidle;
+        break;
+    case Sready:
+        switch (in)
+        {
+        case 'g':
+        case 'G':
+            state = Sget;
+            break;
+        case 's':
+        case 'S':
+            state = Sset;
+            break;
+        default:
+            state = Sidle;
+        }
+        break;
+    case Sget:
+        reg = in;
+        switch (in)
+        {
+        case 's':
+        case 'S':
+            state = Sgetstandby;
+
+            break;
+        default:
+            state = Sidle;
+        };
+        break;
+    case Sset:
+        reg = in;
+        switch (in)
+        {
+        case 'u':
+        case 'U':
+        case 'd':
+        case 'D':
+            state = Sinterger;
+            break;
+        case 's':
+        case 'S':
+            state = Ssetstandby;
+            break;
+        default:
+            state = Sidle;
+            break;
+        }
+        break;
+    case Sgetstandby:
+        if (in == ';')
+        {
+            if (digitalPot.isInStandby())
+                Serial.println("It's on Standby Mode");
+            else
+                Serial.println("Not in Standby Mode");
+        }
+        state = Sidle;
+        break;
+    case Ssetstandby:
+        switch (in)
+        {
+        case ';':
+            state = Sidle;
+            if (val[0] == '1')
+                digitalPot.toStandby(true);
+            else
+                digitalPot.toStandby(false);
+        case '1':
+        case '0':
+            val[0] = in;
+            break;
+        default:
+            state = Sidle;
+        }
+        break;
+    case Sinterger:
+        if ('0' <= in && in <= '9')
+        {
+            cont = (cont == 3) ? cont = 0 : cont;
+            val[cont++] = in;
+        }
+        else
+        {
+            state = Sidle;
+            cont = 0;
+            if (in == ';')
+            {
+                switch (reg)
+                {
+                case 'd':
+                case 'D':
+                    digitalPot.wiperDow(arrayToInteger(val));
+                    break;
+                case 'u':
+                case 'U':
+                    digitalPot.wiperUp(arrayToInteger(val));
+                    break;
+
+                default:
+                    break;
+                }
+            }
+        }
+        break;
+    }
+}
+
+uint8_t arrayToInteger(char *in)
+{
+    return ((uint8_t)in[0] - 48) * 100 + ((uint8_t)in[1] - 48) * 10 + ((uint8_t)in[2] - 48);
 }
