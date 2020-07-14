@@ -1,0 +1,12 @@
+"name": "X9CXXX",
+"keywords": "X9CXXX, X9C102, 9X9C103, 9X9C104, 9X9C503, digital potentiometer",
+"description": "Arduino Library for renesas digital controlled potentiometer ICs (X9C102, 9X9C103, 9X9C104, 9X9C503)",
+"repository":
+{
+  "type": "git",
+  "url": "https://github.com/HebertWP/X9CXXX"
+},
+"version": "1.0",
+"frameworks": "arduino",
+"platforms": "*"
+}

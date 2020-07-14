@@ -1,20 +1,22 @@
 #include <Arduino.h>
-#include "X9C10X.h"
-X9C10X::X9C10X(uint8_t cs, uint8_t inc, uint8_t up_dow)
+#include "X9CXXX.h"
+
+X9CXXX::X9CXXX(uint8_t cs, uint8_t inc, uint8_t up_dow)
 {
     cs__ = cs;
     inc__ = inc;
     up_dow__ = up_dow;
 }
 
-void X9C10X::begin()
+void X9CXXX::begin()
 {
     pinMode(cs__, OUTPUT);
     pinMode(inc__, OUTPUT);
     pinMode(up_dow__, OUTPUT);
     this->toStandby();
 }
-void X9C10X::wiperUp(uint8_t step)
+
+void X9CXXX::wiperUp(uint8_t step)
 {
     digitalWrite(up_dow__, HIGH);
     digitalWrite(inc__, HIGH);
@@ -29,7 +31,7 @@ void X9C10X::wiperUp(uint8_t step)
     }
 }
 
-void X9C10X::wiperDow(uint8_t step)
+void X9CXXX::wiperDow(uint8_t step)
 {
     digitalWrite(up_dow__, LOW);
     digitalWrite(inc__, HIGH);
@@ -44,7 +46,7 @@ void X9C10X::wiperDow(uint8_t step)
     }
 }
 
-void X9C10X::toStandby(bool storeWiper)
+void X9CXXX::toStandby(bool storeWiper)
 {
     delayMicroseconds(1);       
     digitalWrite(inc__, HIGH);
@@ -68,7 +70,7 @@ void X9C10X::toStandby(bool storeWiper)
     delayMicroseconds(100);       
 }
 
-bool X9C10X::isInStandby()
+bool X9CXXX::isInStandby()
 {
     return true;
 };
