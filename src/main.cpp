@@ -4,7 +4,11 @@
 void stateMachine(char in);
 uint8_t arrayToInteger(char *in);
 
-X9C10X digitalPot(1, 1, 1);
+#define CS 4
+#define INC 16
+#define UP_DOW 17
+
+X9C10X digitalPot(CS, INC, UP_DOW);
 
 void setup()
 {

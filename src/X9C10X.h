@@ -14,7 +14,7 @@ public:
     void begin();
     void wiperUp(uint8_t step=1);
     void wiperDow(uint8_t step=1);
-    void toStandby(uint8_t storeWiper=false);
+    void toStandby(bool storeWiper=false);
     bool isInStandby();
 
 private:
