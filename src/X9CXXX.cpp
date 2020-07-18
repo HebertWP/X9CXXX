@@ -6,6 +6,7 @@ X9CXXX::X9CXXX(uint8_t cs, uint8_t inc, uint8_t up_dow)
     cs__ = cs;
     inc__ = inc;
     up_dow__ = up_dow;
+    initied__=false;
 }
 
 void X9CXXX::begin()
@@ -13,64 +14,57 @@ void X9CXXX::begin()
     pinMode(cs__, OUTPUT);
     pinMode(inc__, OUTPUT);
     pinMode(up_dow__, OUTPUT);
-    this->toStandby();
+    digitalWrite(cs__, HIGH);
 }
 
-void X9CXXX::wiperUp(uint8_t step)
+void X9CXXX::wiperUp(uint8_t step, bool save)
 {
+    if(!initied__){
+        this->begin();
+        initied__=true;
+    }
     digitalWrite(up_dow__, HIGH);
     digitalWrite(inc__, HIGH);
-    delay(1);
+    delayMicroseconds(300);
     digitalWrite(cs__, LOW);
     for (int i = 0; i < step; i++)
     {
         digitalWrite(inc__, LOW);
-        delayMicroseconds(1);       
+        delayMicroseconds(3);
         digitalWrite(inc__, HIGH);
-        delayMicroseconds(1);       
+        delayMicroseconds(3);
     }
+    if (save)
+        digitalWrite(inc__, HIGH);
+    else
+        digitalWrite(inc__, LOW);
+    delayMicroseconds(300);
+    digitalWrite(cs__, HIGH);
+    delayMicroseconds(300);
 }
 
-void X9CXXX::wiperDow(uint8_t step)
+void X9CXXX::wiperDow(uint8_t step, bool save)
 {
+    if(!initied__){
+        this->begin();
+        initied__=true;
+    }
     digitalWrite(up_dow__, LOW);
     digitalWrite(inc__, HIGH);
-    delay(1);
+    delayMicroseconds(300);
     digitalWrite(cs__, LOW);
     for (int i = 0; i < step; i++)
     {
         digitalWrite(inc__, LOW);
-        delayMicroseconds(1);       
+        delayMicroseconds(3);
         digitalWrite(inc__, HIGH);
-        delayMicroseconds(1);       
+        delayMicroseconds(3);
     }
-}
-
-void X9CXXX::toStandby(bool storeWiper)
-{
-    delayMicroseconds(1);       
-    digitalWrite(inc__, HIGH);
-    delayMicroseconds(1);       
-    digitalWrite(cs__, LOW);
-    delayMicroseconds(1);       
-    if (storeWiper)
-    {
-        Serial.println("HIGH");
+    if (save)
         digitalWrite(inc__, HIGH);
-    }
     else
-    {
-        Serial.println("LOW");
         digitalWrite(inc__, LOW);
-    }
-    delayMicroseconds(100);       
+    delayMicroseconds(300);
     digitalWrite(cs__, HIGH);
-    delayMicroseconds(100);       
-    digitalWrite(inc__, HIGH);
-    delayMicroseconds(100);       
+    delayMicroseconds(300);
 }
-
-bool X9CXXX::isInStandby()
-{
-    return true;
-};

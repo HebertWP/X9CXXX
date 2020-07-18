@@ -9,15 +9,14 @@ private:
     uint8_t cs__;
     uint8_t inc__;
     uint8_t up_dow__;
+    bool initied__;;
 public:
     X9CXXX(uint8_t cs, uint8_t inc, uint8_t up_dow);
-    void begin();
-    void wiperUp(uint8_t step=1);
-    void wiperDow(uint8_t step=1);
-    void toStandby(bool storeWiper=false);
-    bool isInStandby();
-
+    void wiperUp(uint8_t step =1, bool save = false);
+    void wiperDow(uint8_t step =1, bool save = false);
 private:
+    void begin();
+    
 };
 
 #endif
