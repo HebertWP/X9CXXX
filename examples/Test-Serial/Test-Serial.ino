@@ -4,16 +4,14 @@
 void stateMachine(char in);
 uint8_t arrayToInteger(char *in);
 
-#define CS 4
-#define INC 16
+#define CS 2
+#define INC 25
 #define UP_DOW 17
-
 X9CXXX digitalPot(CS, INC, UP_DOW);
-
+bool save=false;
 void setup()
 {
     Serial.begin(115200);
-    digitalPot.begin();
 }
 
 void loop()
@@ -94,10 +92,10 @@ void stateMachine(char in)
     case Sgetstandby:
         if (in == ';')
         {
-            if (digitalPot.isInStandby())
-                Serial.println("It's on Standby Mode");
+            if (save)
+                Serial.println("Salvando");
             else
-                Serial.println("Not in Standby Mode");
+                Serial.println("Esquecendo");
         }
         state = Sidle;
         break;
@@ -107,9 +105,9 @@ void stateMachine(char in)
         case ';':
             state = Sidle;
             if (val[0] == '1')
-                digitalPot.toStandby(true);
+                save=true;
             else
-                digitalPot.toStandby(false);
+                save=false;
         case '1':
         case '0':
             val[0] = in;
@@ -134,11 +132,15 @@ void stateMachine(char in)
                 {
                 case 'd':
                 case 'D':
-                    digitalPot.wiperDow(arrayToInteger(val));
+                    digitalPot.wiperDow(arrayToInteger(val),save);
+                    Serial.print("DOW:");
+                    Serial.println(arrayToInteger(val));
                     break;
                 case 'u':
                 case 'U':
-                    digitalPot.wiperUp(arrayToInteger(val));
+                    digitalPot.wiperUp(arrayToInteger(val),save);
+                    Serial.print("UP: ");
+                    Serial.println(arrayToInteger(val));
                     break;
 
                 default:
